@@ -2,15 +2,9 @@ from django import template
 from django.db.models import Count
 
 import women.views as views
-from women.models import Category, TagsPosts
-from women.utils import menu
+from women.models import Category, TagPost
 
 register = template.Library()
-
-
-@register.simple_tag
-def get_menu():
-    return menu
 
 
 @register.inclusion_tag('women/list_categories.html')
@@ -21,4 +15,4 @@ def show_categories(cat_selected=0):
 
 @register.inclusion_tag('women/list_tags.html')
 def show_all_tags():
-    return {'tags': TagsPosts.objects.annotate(total=Count("tags")).filter(total__gt=0)}
+    return {'tags': TagPost.objects.annotate(total=Count("tags")).filter(total__gt=0)}
