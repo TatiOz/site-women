@@ -1,9 +1,11 @@
 from django import template
 from django.db.models import Count
 
-import women.views as views
-from women.models import Category, TagsPosts
+# import women.views as views
+# from .models import Category, TagsPosts
 from women.utils import menu
+
+from women.models import Category, TagsPosts
 
 register = template.Library()
 

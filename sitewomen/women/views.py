@@ -8,9 +8,10 @@ from django.template.loader import render_to_string
 from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, FormView, CreateView, UpdateView, DeleteView
 
-from women.forms import AddPostForm, UploadFileForm
-from women.models import Women, Category, TagsPosts, UploadFiles
-from women.utils import DataMixin
+from .forms import AddPostForm
+# from .forms import AddPostForm, UploadFileForm
+from .models import Women, Category, TagsPosts  # , TagsPosts, UploadFiles
+from .utils import DataMixin
 
 
 # Create your views here.
@@ -23,7 +24,7 @@ class WomenHome(DataMixin, ListView):
     def get_queryset(self):
         return Women.publushed.all().select_related('cat')
 
-@login_required  #(login_url='/')
+# @login_required  #(login_url='/')
 def about(request):
     contact_list = Women.publushed.all()
     paginator = Paginator(contact_list, 3)
@@ -49,7 +50,7 @@ class ShowPost(DataMixin, DetailView):
         return get_object_or_404(Women.publushed, slug=self.kwargs[self.slug_url_kwarg])
 
 
-class AddPage(LoginRequiredMixin, DataMixin, CreateView):
+class AddPage( DataMixin, CreateView): #LoginRequiredMixin,
     form_class = AddPostForm
     template_name = 'women/addpage.html'
     title_page = 'Добавление статьи'

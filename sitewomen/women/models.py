@@ -5,6 +5,8 @@ from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django_extensions.db.fields import AutoSlugField
 from transliterate import slugify
+
+
 # from unidecode import unidecode
 
 # Create your models here.
@@ -18,44 +20,48 @@ def translit_to_eng(s: str) -> str:
 
     return "".join(map(lambda x: d[x] if d.get(x, False) else x, s.lower()))
 
+
 class PublushedManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_published=Women.Status.PUBLISHED)
+
+
 class Women(models.Model):
     class Status(models.IntegerChoices):
-        DRAFT= 0, 'Черновик'
-        PUBLISHED= 1, 'Опубликованно'
+        DRAFT = 0, 'Черновик'
+        PUBLISHED = 1, 'Опубликованно'
 
     title = models.CharField(max_length=255, verbose_name='Заголовок')
     # slug = AutoSlugField(populate_from="title", slugify_function=slugify, unique=True, verbose_name='Путь')
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="Slug", validators=[
-                               MinLengthValidator(5, message="Минимум 5 символов"),
-                               MaxLengthValidator(100, message="Максимум 100 символов"),
-                           ])
+        MinLengthValidator(5, message="Минимум 5 символов"),
+        MaxLengthValidator(100, message="Максимум 100 символов"),
+    ])
     photo = models.ImageField(upload_to='photos/%Y/%m/%d', default=None,
                               blank=True, null=True, verbose_name='Фото')
     content = models.TextField(blank=True, verbose_name='Статья')
-    time_create = models.DateTimeField(auto_now_add=True , verbose_name='Время создания')
+    time_create = models.DateTimeField(auto_now_add=True, verbose_name='Время создания')
     time_update = models.DateTimeField(auto_now=True, verbose_name='Время изменения')
+
     is_published = models.BooleanField(choices=tuple(map(lambda x: (bool(x[0]), x[1]), Status.choices)),
-                        default=Status.DRAFT, verbose_name="Статус")
+                                       default=Status.DRAFT, verbose_name="Статус")
 
     cat = models.ForeignKey('Category', on_delete=models.PROTECT, related_name='posts')
     tags = models.ManyToManyField('TagsPosts', default= 0)
     husband = models.OneToOneField('Husband', on_delete=models.SET_NULL,
                                    null=-True, blank=True, related_name='woman')
-    author = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL,
-                               related_name='posts', null=True, default=None)
+    # author = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL,
+    #                            related_name='posts', null=True, default=None)
 
     publushed = PublushedManager()
-    objects=models.Manager()
+    objects = models.Manager()
 
     def __str__(self):
         return self.title
 
     class Meta:
-        verbose_name='Известные женщины'
-        verbose_name_plural='Известные женщины'
+        verbose_name = 'Известные женщины'
+        verbose_name_plural = 'Известные женщины'
         ordering = ['-time_create']
         indexes = [
             models.Index(fields=['-time_create'])
@@ -69,18 +75,18 @@ class Women(models.Model):
     #     self.slug = slugify(transliterated_title)
     #     super().save(*args, **kwargs)
 
+
 class Category(models.Model):
-    name=models.CharField(max_length=100, db_index=True,  verbose_name='Категория')
+    name = models.CharField(max_length=100, db_index=True, verbose_name='Категория')
     slug = models.SlugField(max_length=255, unique=True, db_index=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
-        verbose_name='Категория'
-        verbose_name_plural='Категории'
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
         ordering = ['id']
-
 
     def get_absolute_url(self):
         return reverse('category', kwargs={'cat_slug': self.slug})
@@ -95,8 +101,8 @@ class TagsPosts(models.Model):
 
     def get_absolute_url(self):
         return reverse('tag', kwargs={'tag_slug': self.slug})
-
-
+#
+#
 class Husband(models.Model):
     name = models.CharField(max_length=100)
     age = models.IntegerField(null=True)

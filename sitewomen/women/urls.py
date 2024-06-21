@@ -1,8 +1,9 @@
 from django.urls import path, re_path, register_converter
 from django.urls import path, re_path, register_converter
-from . import views
-from . import converters
-from .views import AddPage
+
+from . import converters, views
+
+from .views import AddPage, WomenHome
 
 register_converter(converters.FourDigitYearConverter, "year4")
 
@@ -18,7 +19,7 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('logout/', views.logout, name='logout'),
     path('post/<slug:post_slug>/', views.ShowPost.as_view(), name='post'),
-    # path('addpage/', views.addpage, name='addpage'),
+    path('addpage/', views.AddPage.as_view(), name='addpage'),
 
 
     path('category/<slug:cat_slug>', views.WomenCategory.as_view(), name='category'),
